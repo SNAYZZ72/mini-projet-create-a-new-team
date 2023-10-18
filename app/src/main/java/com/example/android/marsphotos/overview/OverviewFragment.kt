@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.android.marsphotos.databinding.FragmentOverviewBinding
@@ -55,11 +56,25 @@ class OverviewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         with(viewModel) {
-            photos.observe(viewLifecycleOwner) {
-                adapter.submitList(it)
+            photos.observe(viewLifecycleOwner) { photosList ->
+                if (photosList != null) {
+                    adapter.submitList(photosList)
+                } else {
+                    showErrorDialog("Failed to fetch Mars photos. Please try again later.")
+                }
             }
-
-            // TODO Mettre à jour la vue en cas d'erreur
         }
+    }
+
+    private fun showErrorDialog(errorMessage: String) {
+        val errorDialog = AlertDialog.Builder(requireContext())
+            .setTitle("Error")
+            .setMessage(errorMessage)
+            .setPositiveButton("OK") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+
+        errorDialog.show()
     }
 }
