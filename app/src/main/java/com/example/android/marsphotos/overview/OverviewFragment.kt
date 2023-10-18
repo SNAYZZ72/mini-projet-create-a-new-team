@@ -20,10 +20,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.android.marsphotos.databinding.FragmentOverviewBinding
+import androidx.lifecycle.LiveData
+
 
 /**
  * This fragment shows the the status of the Mars photos web services transaction.
@@ -55,26 +56,24 @@ class OverviewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         with(viewModel) {
-            photos.observe(viewLifecycleOwner) { photosList ->
-                if (photosList != null) {
-                    adapter.submitList(photosList)
+            photos.observe(viewLifecycleOwner) {
+                adapter.submitList(it)
+            }
+
+            // Observez la LiveData d'erreur du ViewModel
+            error.observe(viewLifecycleOwner) { errorMessage ->
+                if (errorMessage != null) {
+                    // Afficher le message d'erreur dans la vue correspondante (le TextView)
+                    binding.errorTextView.text = errorMessage
+                    binding.errorTextView.visibility = View.VISIBLE
                 } else {
-                    showErrorDialog("Failed to fetch Mars photos. Please try again later.")
+                    // Cacher la vue d'erreur si elle n'est pas nécessaire
+                    binding.errorTextView.visibility = View.GONE
                 }
             }
         }
     }
 
-    private fun showErrorDialog(errorMessage: String) {
-        val errorDialog = AlertDialog.Builder(requireContext())
-            .setTitle("Error")
-            .setMessage(errorMessage)
-            .setPositiveButton("OK") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-
-        errorDialog.show()
-    }
 }
