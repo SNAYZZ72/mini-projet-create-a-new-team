@@ -89,7 +89,10 @@ class OverviewFragment : Fragment() {
                 super.onSelectedChanged(viewHolder, actionState)
             }
 
-            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+            override fun clearView(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ) {
                 super.clearView(recyclerView, viewHolder)
                 isSelectionModeActive = false
                 adapter.clearSelection()
