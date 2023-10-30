@@ -1,59 +1,77 @@
-    package com.example.android.marsphotos.overview
+package com.example.android.marsphotos.overview
 
-    import androidx.lifecycle.LiveData
-    import androidx.lifecycle.MediatorLiveData
-    import androidx.lifecycle.MutableLiveData
-    import androidx.lifecycle.ViewModel
-    import androidx.lifecycle.viewModelScope
-    import com.example.android.marsphotos.data.MarsPhoto
-    import com.example.android.marsphotos.repository.MarsRepository
-    import kotlinx.coroutines.Dispatchers
-    import kotlinx.coroutines.launch
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.android.marsphotos.data.MarsPhoto
+import com.example.android.marsphotos.repository.MarsRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-    enum class MarsApiStatus { LOADING, ERROR, DONE }
+enum class MarsApiStatus { LOADING, ERROR, DONE }
 
-    /**
-     * The [ViewModel] that is attached to the [OverviewFragment].
-     */
-    class OverviewViewModel : ViewModel() {
+/**
+ * The [ViewModel] that is attached to the [OverviewFragment].
+ */
+class OverviewViewModel : ViewModel() {
 
-        private val repository = MarsRepository()
+    private val repository = MarsRepository()
 
-        private val _status = MediatorLiveData<MarsApiStatus>()
-        val status: LiveData<MarsApiStatus> = _status
+    private val _status = MediatorLiveData<MarsApiStatus>()
+    val status: LiveData<MarsApiStatus> = _status
 
-        private val _photos = MutableLiveData<List<MarsPhoto>>()
-        val photos: LiveData<List<MarsPhoto>> = _photos
+    private val photosLiveData: MediatorLiveData<List<MarsPhoto>> = MediatorLiveData()
 
-        private val _error = MutableLiveData<String>()
-        val error: LiveData<String>
-            get() = _error
+    val photos: LiveData<List<MarsPhoto>> = photosLiveData
 
-        /**
-         * Call getMarsPhotos() on init so we can display status immediately.
-         */
-        init {
-            getMarsPhotos()
+    private val _error = MutableLiveData<String>()
+    val error: LiveData<String>
+        get() = _error
 
-            _status.addSource(_photos) {
+    init {
+        viewModelScope.launch {
+            try {
+                val result = repository.getPhotos()
+                photosLiveData.value = result
+            } catch (e: Exception) {
+                _error.postValue(e.message)
+            }
+
+            _status.addSource(photosLiveData) {
                 _status.value = if (it.isEmpty()) MarsApiStatus.ERROR else MarsApiStatus.DONE
             }
         }
+    }
 
-        /**
-         * Gets Mars photos information from the Mars API Retrofit service and updates the
-         * [MarsPhotoDto] [List] [LiveData].
-         */
-        private fun getMarsPhotos() {
 
-            viewModelScope.launch(Dispatchers.IO) {
-                _status.postValue(MarsApiStatus.LOADING)
-                try {
-                    _photos.postValue(repository.getPhotos())
-                } catch (e: Exception) {
-                    _photos.postValue(listOf())
-                    _error.postValue(e.message)
-                }
+    private fun getMarsPhotos() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _status.postValue(MarsApiStatus.LOADING)
+            try {
+                photosLiveData
+            } catch (e: Exception) {
+                _error.postValue(e.message)
             }
         }
     }
+
+    private fun refreshPhotos() {
+        //c'est juste pour remettre les données de base de l'api
+        viewModelScope.launch {
+            try {
+                repository.refreshPhotos()
+            } catch (e: Exception) {
+                _error.postValue(e.message)
+            }
+        }
+    }
+
+    fun deletePhoto(photoId: String) {
+        repository.removePhoto(photoId)
+        //on actualise la vue pour que la photo disparaisse
+        photosLiveData.value = photosLiveData.value?.filter { it.id != photoId }
+
+    }
+}

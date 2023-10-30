@@ -5,4 +5,7 @@ import com.example.android.marsphotos.network.model.MarsPhotoDto
 
 interface MarsApi {
     suspend fun getPhotos(): List<MarsPhoto>
+    interface MarsApi {
+        suspend fun getPhotos(): List<MarsPhoto>
+    }
 }

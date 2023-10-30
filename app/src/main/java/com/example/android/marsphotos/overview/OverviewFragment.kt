@@ -1,34 +1,23 @@
-/*
- * Copyright (C) 2021 The Android Open Source Project.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.example.android.marsphotos.overview
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.android.marsphotos.databinding.FragmentOverviewBinding
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+import com.example.android.marsphotos.R
+import com.example.android.marsphotos.data.MarsPhoto
+import kotlinx.coroutines.launch
 
-
-/**
- * This fragment shows the the status of the Mars photos web services transaction.
- */
 class OverviewFragment : Fragment() {
 
     private val viewModel: OverviewViewModel by viewModels()
@@ -41,10 +30,9 @@ class OverviewFragment : Fragment() {
         PhotoGridAdapter()
     }
 
-    /**
-     * Inflates the layout with Data Binding, sets its lifecycle owner to the OverviewFragment
-     * to enable Data Binding to observe LiveData, and sets up the RecyclerView with an adapter.
-     */
+    private var selectedPhotos = mutableSetOf<MarsPhoto>()
+    private var isSelectionModeActive = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -62,18 +50,148 @@ class OverviewFragment : Fragment() {
                 adapter.submitList(it)
             }
 
-            // Observez la LiveData d'erreur du ViewModel
             error.observe(viewLifecycleOwner) { errorMessage ->
                 if (errorMessage != null) {
-                    // Afficher le message d'erreur dans la vue correspondante (le TextView)
                     binding.errorTextView.text = errorMessage
                     binding.errorTextView.visibility = View.VISIBLE
                 } else {
-                    // Cacher la vue d'erreur si elle n'est pas nécessaire
                     binding.errorTextView.visibility = View.GONE
                 }
             }
         }
+
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            0,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                // Nothing to do here for swiping
+            }
+
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                    isSelectionModeActive = true
+                    updateButtonState()
+                } else {
+                    isSelectionModeActive = false
+                    adapter.clearSelection()
+                    updateButtonState()
+                }
+
+                super.onSelectedChanged(viewHolder, actionState)
+            }
+
+            override fun clearView(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ) {
+                super.clearView(recyclerView, viewHolder)
+                isSelectionModeActive = false
+                adapter.clearSelection()
+                updateButtonState()
+            }
+        })
+
+        itemTouchHelper.attachToRecyclerView(binding.photosGrid)
+
+        adapter.setOnPhotoSelectedListener { photo, isSelected ->
+            if (isSelected) {
+                selectedPhotos.add(photo)
+            } else {
+                selectedPhotos.remove(photo)
+            }
+
+            adapter.setSelected(photo, isSelected)
+            updateButtonState()
+            Log.d("SelectedPhotos", "Selected photos: ${selectedPhotos.map { it.id }}")
+        }
+
+        binding.deleteButton.setOnClickListener {
+            selectedPhotos.forEach { photo ->
+                viewModel.deletePhoto(photo.id)
+            }
+            selectedPhotos.clear()
+            adapter.notifyDataSetChanged()
+            updateButtonState()
+        }
+
+        val shareButton = binding.shareButton
+
+        shareButton.setOnClickListener {
+            // Partagez les photos sélectionnées ici
+            shareSelectedPhotos()
+        }
+
+        val cancelButton = binding.cancelButton
+
+        cancelButton.setOnClickListener {
+            // Annuler la sélection en désélectionnant toutes les images
+            adapter.clearSelection()
+            selectedPhotos.clear()
+            updateButtonState()
+            binding.deleteButton.visibility = View.GONE
+            binding.shareButton.visibility = View.GONE
+            binding.cancelButton.visibility = View.GONE
+            binding.deleteButton.isEnabled = false
+            binding.shareButton.isEnabled = false
+        }
+
+        // Gestion du clic simple sur une photo
+        adapter.setOnItemClickListener { photo ->
+            val detailFragment = DetailFragment.newInstance(photo.url)
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(android.R.id.content, detailFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
+        adapter.setOnLongItemClickListener { photo ->
+            // Mettez votre logique de sélection ici
+            if (selectedPhotos.contains(photo)) {
+                selectedPhotos.remove(photo)
+            } else {
+                selectedPhotos.add(photo)
+            }
+            adapter.setSelected(photo, selectedPhotos.contains(photo))
+            updateButtonState()
+        }
     }
 
+    private fun shareSelectedPhotos() {
+        val selectedPhotoUris = selectedPhotos.map { it.url.toUri() }
+
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND_MULTIPLE
+            putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(selectedPhotoUris))
+            type = "image/*"
+        }
+
+        startActivity(Intent.createChooser(sendIntent, "Partager les photos sélectionnées"))
+    }
+
+    private fun updateButtonState() {
+        if (selectedPhotos.isNotEmpty()) {
+            // Au moins une photo est sélectionnée, affiche les boutons "Supprimer" et "Partager"
+            binding.deleteButton.visibility = View.VISIBLE
+            binding.shareButton.visibility = View.VISIBLE
+            binding.cancelButton.visibility = View.VISIBLE
+            binding.deleteButton.isEnabled = true
+            binding.shareButton.isEnabled = true
+        } else {
+            // Aucune photo sélectionnée, cache les boutons "Supprimer" et "Partager"
+            binding.deleteButton.visibility = View.GONE
+            binding.shareButton.visibility = View.GONE
+            binding.cancelButton.visibility = View.GONE
+            binding.deleteButton.isEnabled = false
+            binding.shareButton.isEnabled = false
+        }
+    }
 }
