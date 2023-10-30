@@ -59,6 +59,7 @@ class OverviewViewModel : ViewModel() {
     }
 
     private fun refreshPhotos() {
+        //c'est juste pour remettre les données de base de l'api
         viewModelScope.launch {
             try {
                 repository.refreshPhotos()

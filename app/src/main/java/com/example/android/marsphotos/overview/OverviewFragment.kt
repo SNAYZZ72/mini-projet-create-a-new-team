@@ -105,35 +105,32 @@ class OverviewFragment : Fragment() {
             adapter.setSelected(photo, isSelected)
             updateDeleteButtonState()
             Log.d("SelectedPhotos", "Selected photos: ${selectedPhotos.map { it.id }}")
-
         }
 
-        binding.selectButton.setOnClickListener {
-            if (isSelectionModeActive) {
-                isSelectionModeActive = false
-                binding.selectButton.text = "Sélectionner"
-            } else {
-                isSelectionModeActive = true
-                binding.selectButton.text = "Annuler la sélection"
-            }
 
-            adapter.notifyDataSetChanged()
-            updateDeleteButtonState()
-        }
 
         binding.deleteButton.setOnClickListener {
             selectedPhotos.forEach { photo ->
                 viewModel.deletePhoto(photo.id)
             }
             selectedPhotos.clear()
-            // Mettez à jour l'UI pour refléter les suppressions
             adapter.notifyDataSetChanged()
+            updateDeleteButtonState()
+
         }
 
 
     }
 
     private fun updateDeleteButtonState() {
-        binding.deleteButton.isEnabled = isSelectionModeActive && selectedPhotos.isNotEmpty()
+        if (selectedPhotos.isNotEmpty()) {
+            binding.deleteButton.visibility = View.VISIBLE
+            binding.deleteButton.isEnabled = true
+        } else {
+            binding.deleteButton.visibility = View.GONE
+            binding.deleteButton.isEnabled = false
+        }
     }
+
+
 }

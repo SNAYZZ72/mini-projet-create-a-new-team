@@ -52,20 +52,10 @@
         android:layout_height="wrap_content"
         android:text="Supprimer"
         android:enabled="false"
+        android:visibility="gone"
         android:layout_marginStart="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="MissingConstraints,UnknownId" />
-
-    <Button
-        android:id="@+id/selectButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sélectionner"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:ignore="MissingConstraints,UnknownId" />
-
-
 
 
 

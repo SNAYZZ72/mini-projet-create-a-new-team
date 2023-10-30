@@ -36,10 +36,17 @@ class PhotoGridAdapter :
         fun bind(photo: MarsPhoto) {
             bindImage(photo.url)
 
+            /*
             binding.root.setOnClickListener {
                 // Appel du listener lorsque l'utilisateur clique sur une image
                 val isSelected = !selectedPhotos.contains(photo)
                 listener(photo, isSelected)
+            }
+            */
+            binding.root.setOnLongClickListener {
+                val isSelected = !selectedPhotos.contains(photo)
+                listener(photo, isSelected)
+                return@setOnLongClickListener true
             }
 
             // Mettez ici l'UI de l'élément sélectionné
