@@ -1,10 +1,12 @@
 package com.example.android.marsphotos.overview
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.android.marsphotos.databinding.FragmentOverviewBinding
@@ -75,11 +77,11 @@ class OverviewFragment : Fragment() {
             override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
                 if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
                     isSelectionModeActive = true
-                    updateDeleteButtonState()
+                    updateButtonState()
                 } else {
                     isSelectionModeActive = false
                     adapter.clearSelection()
-                    updateDeleteButtonState()
+                    updateButtonState()
                 }
 
                 super.onSelectedChanged(viewHolder, actionState)
@@ -89,7 +91,7 @@ class OverviewFragment : Fragment() {
                 super.clearView(recyclerView, viewHolder)
                 isSelectionModeActive = false
                 adapter.clearSelection()
-                updateDeleteButtonState()
+                updateButtonState()
             }
         })
 
@@ -103,7 +105,7 @@ class OverviewFragment : Fragment() {
             }
 
             adapter.setSelected(photo, isSelected)
-            updateDeleteButtonState()
+            updateButtonState()
             Log.d("SelectedPhotos", "Selected photos: ${selectedPhotos.map { it.id }}")
         }
 
@@ -115,22 +117,48 @@ class OverviewFragment : Fragment() {
             }
             selectedPhotos.clear()
             adapter.notifyDataSetChanged()
-            updateDeleteButtonState()
-
+            updateButtonState()
         }
 
+        val shareButton = binding.shareButton
+
+        shareButton.setOnClickListener {
+            // Partagez les photos sélectionnées ici
+            shareSelectedPhotos()
+        }
 
     }
 
-    private fun updateDeleteButtonState() {
+    private fun shareSelectedPhotos() {
+        val selectedPhotoUris = selectedPhotos.map { it.url.toUri() }
+
+        val sendIntent = Intent().apply {
+            action = Intent.ACTION_SEND_MULTIPLE
+            putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(selectedPhotoUris))
+            type = "image/*"
+        }
+
+        startActivity(Intent.createChooser(sendIntent, "Partager les photos sélectionnées"))
+    }
+
+
+
+    private fun updateButtonState() {
         if (selectedPhotos.isNotEmpty()) {
+            // Au moins une photo est sélectionnée, affiche les boutons "Supprimer" et "Partager"
             binding.deleteButton.visibility = View.VISIBLE
+            binding.shareButton.visibility = View.VISIBLE
             binding.deleteButton.isEnabled = true
+            binding.shareButton.isEnabled = true
         } else {
+            // Aucune photo sélectionnée, cache les boutons "Supprimer" et "Partager"
             binding.deleteButton.visibility = View.GONE
+            binding.shareButton.visibility = View.GONE
             binding.deleteButton.isEnabled = false
+            binding.shareButton.isEnabled = false
         }
     }
+
 
 
 }
