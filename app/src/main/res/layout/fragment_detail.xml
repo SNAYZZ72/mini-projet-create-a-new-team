@@ -5,13 +5,20 @@
     android:layout_height="match_parent"
     tools:context="DetailFragment">
 
-    <ImageView
-        android:id="@+id/detailImageView"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        app:srcCompat="@drawable/ic_launcher_foreground" />
+        android:background="@android:color/black"
+        android:id="@+id/imageContainer">
+
+        <ImageView
+            android:id="@+id/detailImageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_launcher_foreground" />
+    </FrameLayout>
 
     <Button
         android:id="@+id/returnButton"

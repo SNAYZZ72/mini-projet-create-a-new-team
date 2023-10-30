@@ -132,6 +132,7 @@ class OverviewFragment : Fragment() {
         cancelButton.setOnClickListener {
             // Annuler la sélection en désélectionnant toutes les images
             adapter.clearSelection()
+            selectedPhotos.clear()
             updateButtonState()
             binding.deleteButton.visibility = View.GONE
             binding.shareButton.visibility = View.GONE
