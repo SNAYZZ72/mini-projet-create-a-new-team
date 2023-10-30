@@ -20,11 +20,17 @@ class PhotoGridAdapter :
 
     private lateinit var listener: (MarsPhoto, Boolean) -> Unit
     private val selectedPhotos = mutableListOf<MarsPhoto>()
+    private var longClickListener: ((MarsPhoto) -> Unit)? = null
+
+    fun setOnLongItemClickListener(listener: (MarsPhoto) -> Unit) {
+        longClickListener = listener
+    }
 
     class MarsPhotosViewHolder(
         private val binding: GridViewItemBinding,
         private val listener: (MarsPhoto, Boolean) -> Unit,
-        private val selectedPhotos: MutableList<MarsPhoto>
+        private val selectedPhotos: MutableList<MarsPhoto>,
+        private val longClickListener: ((MarsPhoto) -> Unit)?
 
     ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -36,17 +42,13 @@ class PhotoGridAdapter :
         fun bind(photo: MarsPhoto) {
             bindImage(photo.url)
 
-            /*
-            binding.root.setOnClickListener {
-                // Appel du listener lorsque l'utilisateur clique sur une image
-                val isSelected = !selectedPhotos.contains(photo)
-                listener(photo, isSelected)
-            }
-            */
             binding.root.setOnLongClickListener {
-                val isSelected = !selectedPhotos.contains(photo)
-                listener(photo, isSelected)
+                longClickListener?.invoke(photo)
                 return@setOnLongClickListener true
+            }
+
+            binding.root.setOnClickListener {
+                listener(photo, false) // Désélectionnez l'image lors du clic simple
             }
 
             // Mettez ici l'UI de l'élément sélectionné
@@ -95,7 +97,7 @@ class PhotoGridAdapter :
     ): MarsPhotosViewHolder {
         return MarsPhotosViewHolder(
             GridViewItemBinding.inflate(LayoutInflater.from(parent.context))
-            , listener, selectedPhotos
+            , listener, selectedPhotos , longClickListener
         )
     }
 
@@ -125,6 +127,10 @@ class PhotoGridAdapter :
             selectedPhotos.remove(photo)
         }
         notifyDataSetChanged()
+    }
+
+    fun setOnItemClickListener(listener: (MarsPhoto) -> Unit) {
+        this.listener = { photo, _ -> listener(photo) }
     }
 
 

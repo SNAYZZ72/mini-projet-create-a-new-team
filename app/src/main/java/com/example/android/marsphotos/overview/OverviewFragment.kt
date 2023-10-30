@@ -13,6 +13,7 @@ import com.example.android.marsphotos.databinding.FragmentOverviewBinding
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.example.android.marsphotos.R
 import com.example.android.marsphotos.data.MarsPhoto
 import kotlinx.coroutines.launch
 
@@ -109,8 +110,6 @@ class OverviewFragment : Fragment() {
             Log.d("SelectedPhotos", "Selected photos: ${selectedPhotos.map { it.id }}")
         }
 
-
-
         binding.deleteButton.setOnClickListener {
             selectedPhotos.forEach { photo ->
                 viewModel.deletePhoto(photo.id)
@@ -127,6 +126,25 @@ class OverviewFragment : Fragment() {
             shareSelectedPhotos()
         }
 
+        // Gestion du clic simple sur une photo
+        adapter.setOnItemClickListener { photo ->
+            val detailFragment = DetailFragment.newInstance(photo.url)
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(android.R.id.content, detailFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
+        adapter.setOnLongItemClickListener { photo ->
+            // Mettez votre logique de sélection ici
+            if (selectedPhotos.contains(photo)) {
+                selectedPhotos.remove(photo)
+            } else {
+                selectedPhotos.add(photo)
+            }
+            adapter.setSelected(photo, selectedPhotos.contains(photo))
+            updateButtonState()
+        }
     }
 
     private fun shareSelectedPhotos() {
@@ -140,8 +158,6 @@ class OverviewFragment : Fragment() {
 
         startActivity(Intent.createChooser(sendIntent, "Partager les photos sélectionnées"))
     }
-
-
 
     private fun updateButtonState() {
         if (selectedPhotos.isNotEmpty()) {
@@ -158,7 +174,4 @@ class OverviewFragment : Fragment() {
             binding.shareButton.isEnabled = false
         }
     }
-
-
-
 }
