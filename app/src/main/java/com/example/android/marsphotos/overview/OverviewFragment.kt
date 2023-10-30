@@ -1,34 +1,19 @@
-/*
- * Copyright (C) 2021 The Android Open Source Project.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.example.android.marsphotos.overview
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.android.marsphotos.databinding.FragmentOverviewBinding
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+import com.example.android.marsphotos.data.MarsPhoto
+import kotlinx.coroutines.launch
 
-
-/**
- * This fragment shows the the status of the Mars photos web services transaction.
- */
 class OverviewFragment : Fragment() {
 
     private val viewModel: OverviewViewModel by viewModels()
@@ -41,10 +26,9 @@ class OverviewFragment : Fragment() {
         PhotoGridAdapter()
     }
 
-    /**
-     * Inflates the layout with Data Binding, sets its lifecycle owner to the OverviewFragment
-     * to enable Data Binding to observe LiveData, and sets up the RecyclerView with an adapter.
-     */
+    private var selectedPhotos = mutableSetOf<MarsPhoto>()
+    private var isSelectionModeActive = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -62,18 +46,94 @@ class OverviewFragment : Fragment() {
                 adapter.submitList(it)
             }
 
-            // Observez la LiveData d'erreur du ViewModel
             error.observe(viewLifecycleOwner) { errorMessage ->
                 if (errorMessage != null) {
-                    // Afficher le message d'erreur dans la vue correspondante (le TextView)
                     binding.errorTextView.text = errorMessage
                     binding.errorTextView.visibility = View.VISIBLE
                 } else {
-                    // Cacher la vue d'erreur si elle n'est pas nécessaire
                     binding.errorTextView.visibility = View.GONE
                 }
             }
         }
+
+        val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            0,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                // Nothing to do here for swiping
+            }
+
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                    isSelectionModeActive = true
+                    updateDeleteButtonState()
+                } else {
+                    isSelectionModeActive = false
+                    adapter.clearSelection()
+                    updateDeleteButtonState()
+                }
+
+                super.onSelectedChanged(viewHolder, actionState)
+            }
+
+            override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+                super.clearView(recyclerView, viewHolder)
+                isSelectionModeActive = false
+                adapter.clearSelection()
+                updateDeleteButtonState()
+            }
+        })
+
+        itemTouchHelper.attachToRecyclerView(binding.photosGrid)
+
+        adapter.setOnPhotoSelectedListener { photo, isSelected ->
+            if (isSelected) {
+                selectedPhotos.add(photo)
+            } else {
+                selectedPhotos.remove(photo)
+            }
+
+            adapter.setSelected(photo, isSelected)
+            updateDeleteButtonState()
+            Log.d("SelectedPhotos", "Selected photos: ${selectedPhotos.map { it.id }}")
+
+        }
+
+        binding.selectButton.setOnClickListener {
+            if (isSelectionModeActive) {
+                isSelectionModeActive = false
+                binding.selectButton.text = "Sélectionner"
+            } else {
+                isSelectionModeActive = true
+                binding.selectButton.text = "Annuler la sélection"
+            }
+
+            adapter.notifyDataSetChanged()
+            updateDeleteButtonState()
+        }
+
+        binding.deleteButton.setOnClickListener {
+            selectedPhotos.forEach { photo ->
+                viewModel.deletePhoto(photo.id)
+            }
+            selectedPhotos.clear()
+            // Mettez à jour l'UI pour refléter les suppressions
+            adapter.notifyDataSetChanged()
+        }
+
+
     }
 
+    private fun updateDeleteButtonState() {
+        binding.deleteButton.isEnabled = isSelectionModeActive && selectedPhotos.isNotEmpty()
+    }
 }
