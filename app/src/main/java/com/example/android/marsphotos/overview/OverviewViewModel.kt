@@ -75,4 +75,14 @@ class OverviewViewModel : ViewModel() {
         photosLiveData.value = photosLiveData.value?.filter { it.id != photoId }
 
     }
+
+    fun getPhotoById(photoId: String?): MarsPhoto? {
+        return photosLiveData.value?.find { it.id == photoId }
+    }
+
+    fun updatePhoto(marsPhoto: MarsPhoto?) {
+        if (marsPhoto != null) {
+            repository.updatePhoto(marsPhoto.id, marsPhoto.liked ?: false)
+        }
+    }
 }

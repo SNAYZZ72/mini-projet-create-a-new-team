@@ -5,5 +5,9 @@ import com.example.android.marsphotos.network.model.MarsPhotoDto
 
 fun MarsPhotoDto.toMarsPhoto() = MarsPhoto(
     id = id,
-    url = imgSrcUrl
+    url = imgSrcUrl,
+    tags = tags,
+    liked = liked,
+    shared = shared,
+    deleted = deleted
 )

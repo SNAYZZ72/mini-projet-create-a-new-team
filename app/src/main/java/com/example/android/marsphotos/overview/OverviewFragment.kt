@@ -5,6 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -18,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.android.marsphotos.R
 import com.example.android.marsphotos.data.MarsPhoto
 import kotlinx.coroutines.launch
+import okhttp3.internal.filterList
 
 class OverviewFragment : Fragment() {
 
@@ -59,6 +63,39 @@ class OverviewFragment : Fragment() {
         val dialog = builder.create()
         dialog.show()
     }
+
+    @Deprecated("Deprecated in Java")
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_overview, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_filter_liked -> {
+                val likedPhotos = viewModel.photos.value?.filter { it.liked == true }
+                if (likedPhotos.isNullOrEmpty()) {
+                    adapter.submitList(viewModel.photos.value)
+                } else {
+                    adapter.submitList(likedPhotos)
+                }
+                true
+            }
+            R.id.action_filter_all -> {
+                adapter.submitList(viewModel.photos.value)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true) // Active l'affichage du menu
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -122,6 +159,7 @@ class OverviewFragment : Fragment() {
                 adapter.clearSelection()
                 updateButtonState()
             }
+
         })
 
         itemTouchHelper.attachToRecyclerView(binding.photosGrid)
@@ -175,7 +213,7 @@ class OverviewFragment : Fragment() {
 
         // Gestion du clic simple sur une photo
         adapter.setOnItemClickListener { photo ->
-            val detailFragment = DetailFragment.newInstance(photo.url)
+            val detailFragment = DetailFragment.newInstance(photo.url, photo.liked ?: false, photo.id)
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(android.R.id.content, detailFragment)
                 .addToBackStack(null)

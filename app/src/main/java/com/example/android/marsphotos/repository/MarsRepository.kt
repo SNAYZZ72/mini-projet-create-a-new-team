@@ -26,4 +26,10 @@ class MarsRepository {
         Log.d("MarsRepository", "removePhoto: $photoId")
     }
 
+    fun updatePhoto(photoId: String, liked: Boolean) {
+        marsPhotos.find { it.id == photoId }?.liked = liked
+        Log.d("MarsRepository", "updatePhoto: $photoId")
+        Log.d("MarsRepository", "updatePhoto: $liked")
+    }
+
 }

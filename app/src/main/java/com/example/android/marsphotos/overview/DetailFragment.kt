@@ -6,12 +6,18 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import coil.load
 import com.example.android.marsphotos.R
+import com.example.android.marsphotos.data.MarsPhoto
 import com.example.android.marsphotos.databinding.FragmentDetailBinding
+import com.example.android.marsphotos.overview.OverviewViewModel
+import kotlin.properties.Delegates
 
 class DetailFragment : Fragment() {
     private lateinit var binding: FragmentDetailBinding
+    private var isLiked: Boolean = false
+    private var photoId: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,6 +32,7 @@ class DetailFragment : Fragment() {
 
         // Récupérez l'URL de l'image passée en argument
         val imageUrl = arguments?.getString(ARG_IMAGE_URL)
+        val favoriteButton = binding.root.findViewById<ImageButton>(R.id.favoriteButton)
 
         val returnButton = binding.root.findViewById<ImageButton>(R.id.returnButton)
         val frameLayout = view.findViewById<FrameLayout>(R.id.imageContainer)
@@ -37,10 +44,28 @@ class DetailFragment : Fragment() {
         }
 
         returnButton.visibility = View.VISIBLE
+        favoriteButton.visibility = View.VISIBLE
+
+        photoId = arguments?.getString(ARG_PHOTO_ID) ?: ""
+
+        val viewModel = ViewModelProvider(requireActivity())[OverviewViewModel::class.java]
+        val marsPhoto = viewModel.getPhotoById(photoId)
+
+        isLiked = marsPhoto?.liked ?: false
+        updateFavoriteButtonState()
 
         returnButton.setOnClickListener {
             frameLayout.visibility = View.GONE
+            favoriteButton.visibility = View.GONE
             returnButton.visibility = View.GONE
+        }
+
+
+        favoriteButton.setOnClickListener {
+            isLiked = !isLiked
+            marsPhoto?.liked = isLiked
+            viewModel.updatePhoto(marsPhoto)
+            updateFavoriteButtonState()
         }
 
         binding.detailImageView.setOnClickListener {
@@ -48,14 +73,23 @@ class DetailFragment : Fragment() {
         }
     }
 
+    private fun updateFavoriteButtonState() {
+        // Mettez à jour l'apparence du bouton "J'aime" en fonction de l'état "liked"
+        val favoriteButton = binding.root.findViewById<ImageButton>(R.id.favoriteButton)
+        favoriteButton.setImageResource(if (isLiked) R.drawable.ic_favorite_24 else R.drawable.ic_favorite_border_24)
+    }
+
     companion object {
         private const val ARG_IMAGE_URL = "image_url"
+        private const val ARG_IS_LIKED = "is_liked"
+        private const val ARG_PHOTO_ID = "photo_id"
 
-        // Méthode pour créer une nouvelle instance de DetailFragment avec l'URL de l'image
-        fun newInstance(imageUrl: String): DetailFragment {
+        fun newInstance(imageUrl: String, isLiked: Boolean, photoId: String): DetailFragment {
             val fragment = DetailFragment()
             val args = Bundle()
             args.putString(ARG_IMAGE_URL, imageUrl)
+            args.putBoolean(ARG_IS_LIKED, isLiked)
+            args.putString(ARG_PHOTO_ID, photoId)
             fragment.arguments = args
             return fragment
         }
