@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import coil.load
 import com.example.android.marsphotos.R
@@ -26,7 +27,7 @@ class DetailFragment : Fragment() {
         // Récupérez l'URL de l'image passée en argument
         val imageUrl = arguments?.getString(ARG_IMAGE_URL)
 
-        val returnButton = binding.root.findViewById<Button>(R.id.returnButton)
+        val returnButton = binding.root.findViewById<ImageButton>(R.id.returnButton)
         val frameLayout = view.findViewById<FrameLayout>(R.id.imageContainer)
 
         // Chargez l'image en grand dans l'ImageView

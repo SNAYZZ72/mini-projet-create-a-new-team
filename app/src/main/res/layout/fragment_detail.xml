@@ -6,10 +6,10 @@
     tools:context="DetailFragment">
 
     <FrameLayout
+        android:id="@+id/imageContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/black"
-        android:id="@+id/imageContainer">
+        android:background="@android:color/black">
 
         <ImageView
             android:id="@+id/detailImageView"
@@ -20,15 +20,16 @@
             app:srcCompat="@drawable/ic_launcher_foreground" />
     </FrameLayout>
 
-    <Button
+    <ImageButton
         android:id="@+id/returnButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Retour"
-        android:visibility="gone"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
-
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/rounded_button_background"
+        android:padding="5dp"
+        android:src="@drawable/ic_return_24"
+        android:visibility="gone" />
 </RelativeLayout>

@@ -45,42 +45,48 @@
         android:visibility="gone"
         tools:ignore="MissingConstraints" />
 
-
-    <Button
-        android:id="@+id/deleteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:enabled="false"
-        android:text="Supprimer"
-        android:visibility="gone"
-        app:layout_constraintEnd_toStartOf="@id/shareButton"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints,UnknownId" />
-
-
-    <Button
+    <ImageButton
         android:id="@+id/shareButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="6dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/rounded_button_background"
+        android:padding="5dp"
         android:enabled="false"
-        android:text="Partager"
+        android:src="@drawable/ic_share_24"
         android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/deleteButton"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
+    <ImageButton
+        android:id="@+id/deleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/rounded_button_background"
+        android:padding="5dp"
+        android:enabled="false"
+        android:src="@drawable/ic_delete_24"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints,UnknownId" />
 
-    <Button
+    <ImageButton
         android:id="@+id/cancelButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:text="Annuler"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/rounded_button_background"
+        android:padding="5dp"
+        android:src="@drawable/ic_close_24"
         android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
