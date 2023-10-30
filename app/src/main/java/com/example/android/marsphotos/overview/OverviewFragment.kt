@@ -1,5 +1,6 @@
 package com.example.android.marsphotos.overview
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -32,6 +33,32 @@ class OverviewFragment : Fragment() {
 
     private var selectedPhotos = mutableSetOf<MarsPhoto>()
     private var isSelectionModeActive = false
+
+    private fun showDeleteConfirmationDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+
+        builder.setTitle("Supprimer les photos sélectionnées")
+        builder.setMessage("Êtes-vous sûr de vouloir supprimer les photos sélectionnées ?")
+
+        // Bouton de confirmation
+        builder.setPositiveButton("Supprimer") { dialog, which ->
+            // Supprimez les photos ici
+            selectedPhotos.forEach { photo ->
+                viewModel.deletePhoto(photo.id)
+            }
+            selectedPhotos.clear()
+            adapter.notifyDataSetChanged()
+            updateButtonState()
+        }
+
+        // Bouton d'annulation
+        builder.setNegativeButton("Annuler") { dialog, which ->
+            dialog.dismiss() // Fermez la boîte de dialogue
+        }
+
+        val dialog = builder.create()
+        dialog.show()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -112,12 +139,17 @@ class OverviewFragment : Fragment() {
         }
 
         binding.deleteButton.setOnClickListener {
-            selectedPhotos.forEach { photo ->
-                viewModel.deletePhoto(photo.id)
+            if (selectedPhotos.isNotEmpty()) {
+                showDeleteConfirmationDialog()
             }
-            selectedPhotos.clear()
-            adapter.notifyDataSetChanged()
-            updateButtonState()
+            else {
+                selectedPhotos.forEach { photo ->
+                    viewModel.deletePhoto(photo.id)
+                }
+                selectedPhotos.clear()
+                adapter.notifyDataSetChanged()
+                updateButtonState()
+            }
         }
 
         val shareButton = binding.shareButton
