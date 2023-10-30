@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -126,6 +127,19 @@ class OverviewFragment : Fragment() {
             shareSelectedPhotos()
         }
 
+        val cancelButton = binding.cancelButton
+
+        cancelButton.setOnClickListener {
+            // Annuler la sélection en désélectionnant toutes les images
+            adapter.clearSelection()
+            updateButtonState()
+            binding.deleteButton.visibility = View.GONE
+            binding.shareButton.visibility = View.GONE
+            binding.cancelButton.visibility = View.GONE
+            binding.deleteButton.isEnabled = false
+            binding.shareButton.isEnabled = false
+        }
+
         // Gestion du clic simple sur une photo
         adapter.setOnItemClickListener { photo ->
             val detailFragment = DetailFragment.newInstance(photo.url)
@@ -164,12 +178,14 @@ class OverviewFragment : Fragment() {
             // Au moins une photo est sélectionnée, affiche les boutons "Supprimer" et "Partager"
             binding.deleteButton.visibility = View.VISIBLE
             binding.shareButton.visibility = View.VISIBLE
+            binding.cancelButton.visibility = View.VISIBLE
             binding.deleteButton.isEnabled = true
             binding.shareButton.isEnabled = true
         } else {
             // Aucune photo sélectionnée, cache les boutons "Supprimer" et "Partager"
             binding.deleteButton.visibility = View.GONE
             binding.shareButton.visibility = View.GONE
+            binding.cancelButton.visibility = View.GONE
             binding.deleteButton.isEnabled = false
             binding.shareButton.isEnabled = false
         }

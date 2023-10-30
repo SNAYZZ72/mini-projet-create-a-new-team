@@ -2,6 +2,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import coil.load
 import com.example.android.marsphotos.R
@@ -24,10 +25,23 @@ class DetailFragment : Fragment() {
         // Récupérez l'URL de l'image passée en argument
         val imageUrl = arguments?.getString(ARG_IMAGE_URL)
 
+        val returnButton = binding.root.findViewById<Button>(R.id.returnButton)
+
         // Chargez l'image en grand dans l'ImageView
         binding.detailImageView.load(imageUrl) {
             placeholder(R.drawable.loading_animation)
             error(R.drawable.ic_broken_image)
+        }
+
+        returnButton.visibility = View.VISIBLE
+
+        returnButton.setOnClickListener {
+            binding.detailImageView.visibility = View.GONE
+            returnButton.visibility = View.GONE
+        }
+
+        binding.detailImageView.setOnClickListener {
+            binding.detailImageView.visibility = View.VISIBLE
         }
     }
 
