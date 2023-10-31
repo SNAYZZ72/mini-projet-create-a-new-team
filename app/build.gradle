@@ -21,7 +21,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         applicationId "com.example.android.marsphotos"
@@ -71,12 +71,10 @@ dependencies {
     // Coil
     implementation "io.coil-kt:coil:2.2.2"
 
-    // Room
-    def room_version = "2.5.0"
-    implementation("androidx.room:room-runtime:$room_version")
-    annotationProcessor("androidx.room:room-compiler:$room_version")
-
-    // To use Kotlin annotation processing tool (kapt)
-    kapt("androidx.room:room-compiler:$room_version")
+    // jetpack room
+    implementation "androidx.room:room-runtime:2.6.0"
+    implementation "androidx.room:room-ktx:2.6.0"
+    implementation "androidx.room:room-common:2.6.0"
+    kapt "androidx.room:room-compiler:2.6.0"
 
 }
