@@ -96,8 +96,10 @@ class PhotoGridAdapter :
         viewType: Int
     ): MarsPhotosViewHolder {
         return MarsPhotosViewHolder(
-            GridViewItemBinding.inflate(LayoutInflater.from(parent.context))
-            , listener, selectedPhotos , longClickListener
+            GridViewItemBinding.inflate(LayoutInflater.from(parent.context)),
+            listener,
+            selectedPhotos,
+            longClickListener
         )
     }
 
@@ -120,6 +122,7 @@ class PhotoGridAdapter :
         notifyDataSetChanged()
 
     }
+
     fun setSelected(photo: MarsPhoto, isSelected: Boolean) {
         if (isSelected) {
             selectedPhotos.add(photo)

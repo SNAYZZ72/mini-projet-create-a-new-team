@@ -46,7 +46,6 @@ class OverviewViewModel : ViewModel() {
     }
 
 
-
     private fun getMarsPhotos() {
         viewModelScope.launch(Dispatchers.IO) {
             _status.postValue(MarsApiStatus.LOADING)
