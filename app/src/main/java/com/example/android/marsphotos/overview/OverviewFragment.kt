@@ -200,21 +200,14 @@ class OverviewFragment : Fragment() {
             else {
                 selectedPhotos.forEach { photo ->
                     viewModel.deletePhoto(photo.id)
+                    viewModel.viewModelScope.launch {
+                        repository.deletePhotoR(photo)
+                    }
                 }
                 selectedPhotos.clear()
                 adapter.notifyDataSetChanged()
                 updateButtonState()
             }
-            selectedPhotos.forEach { photo ->
-                viewModel.deletePhoto(photo.id)
-                viewModel.viewModelScope.launch {
-                    repository.deletePhotoR(photo)
-                }
-            }
-
-            selectedPhotos.clear()
-            adapter.notifyDataSetChanged()
-            updateButtonState()
         }
 
         val shareButton = binding.shareButton
@@ -240,7 +233,7 @@ class OverviewFragment : Fragment() {
 
         // Gestion du clic simple sur une photo
         adapter.setOnItemClickListener { photo ->
-            val detailFragment = DetailFragment.newInstance(photo.url, photo.liked ?: false, photo.id)
+            val detailFragment = DetailFragment.newInstance(photo.url, photo.liked ?: false, photo.id, repository, database)
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(android.R.id.content, detailFragment)
                 .addToBackStack(null)

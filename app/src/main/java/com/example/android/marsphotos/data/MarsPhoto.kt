@@ -8,7 +8,6 @@ data class MarsPhoto(
     @PrimaryKey
     val id: String,
     val url: String,
-    val tags: List<String>?,
     var liked: Boolean?,
     val shared: Boolean?,
     val deleted: Boolean?

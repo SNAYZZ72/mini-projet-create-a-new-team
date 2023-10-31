@@ -30,7 +30,10 @@ class MarsRepository(private val marsPhotoDao: MarsPhotoDao, private val context
             val entities = photosFromApi.map {
                 MarsPhoto(
                     id = it.id,
-                    it.url
+                    it.url,
+                    it.liked,
+                    it.shared,
+                    it.deleted
                 )
             }
             marsPhotoDao.insertAllImage(entities)
@@ -39,7 +42,10 @@ class MarsRepository(private val marsPhotoDao: MarsPhotoDao, private val context
             return marsPhotoDao.getAllImages().map {
                 MarsPhoto(
                     id = it.id,
-                    it.url
+                    it.url,
+                    it.liked,
+                    it.shared,
+                    it.deleted
                 )
             }
         }

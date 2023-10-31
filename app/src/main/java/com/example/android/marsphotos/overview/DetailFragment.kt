@@ -9,9 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import coil.load
 import com.example.android.marsphotos.R
+import com.example.android.marsphotos.data.MarsDatabase
 import com.example.android.marsphotos.data.MarsPhoto
 import com.example.android.marsphotos.databinding.FragmentDetailBinding
 import com.example.android.marsphotos.overview.OverviewViewModel
+import com.example.android.marsphotos.overview.OverviewViewModelFactory
+import com.example.android.marsphotos.repository.MarsRepository
 import kotlin.properties.Delegates
 
 class DetailFragment : Fragment() {
@@ -48,7 +51,7 @@ class DetailFragment : Fragment() {
 
         photoId = arguments?.getString(ARG_PHOTO_ID) ?: ""
 
-        val viewModel = ViewModelProvider(requireActivity())[OverviewViewModel::class.java]
+        val viewModel = ViewModelProvider(requireActivity(), OverviewViewModelFactory(MarsRepository(MarsDatabase.getInstance(requireContext()).marsPhotoDao, requireContext()), MarsDatabase.getInstance(requireContext()))).get(OverviewViewModel::class.java)
         val marsPhoto = viewModel.getPhotoById(photoId)
 
         isLiked = marsPhoto?.liked ?: false
@@ -83,15 +86,27 @@ class DetailFragment : Fragment() {
         private const val ARG_IMAGE_URL = "image_url"
         private const val ARG_IS_LIKED = "is_liked"
         private const val ARG_PHOTO_ID = "photo_id"
+        private const val ARG_REPOSITORY = "repository"
+        private const val ARG_DATABASE = "database"
 
-        fun newInstance(imageUrl: String, isLiked: Boolean, photoId: String): DetailFragment {
+        fun newInstance(imageUrl: String, isLiked: Boolean, photoId: String, repository: MarsRepository, database: MarsDatabase): DetailFragment {
             val fragment = DetailFragment()
             val args = Bundle()
             args.putString(ARG_IMAGE_URL, imageUrl)
             args.putBoolean(ARG_IS_LIKED, isLiked)
             args.putString(ARG_PHOTO_ID, photoId)
+            args.putSerializable(ARG_REPOSITORY, repository)
+            args.putSerializable(ARG_DATABASE, database)
             fragment.arguments = args
             return fragment
         }
     }
+}
+
+private fun Bundle.putSerializable(argRepository: String, database: MarsDatabase) {
+
+}
+
+private fun Bundle.putSerializable(argRepository: String, repository: MarsRepository) {
+
 }

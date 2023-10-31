@@ -26,7 +26,6 @@ data class MarsPhotoDto(
         val id: String,
         // used to map img_src from the JSON to imgSrcUrl in our class
         @Json(name = "img_src") val imgSrcUrl: String,
-        val tags: List<String>?,
         val liked: Boolean?,
         val shared: Boolean?,
         val deleted: Boolean?
