@@ -103,7 +103,7 @@ class MarsRepository(private val marsPhotoDao: MarsPhotoDao, private val context
     }
 
     suspend fun savePhotoToDatabase(encodedImage: String) {
-        val marsPhoto = MarsPhoto(id = UUID.randomUUID().toString(), url = encodedImage)
+        val marsPhoto = MarsPhoto(id = UUID.randomUUID().toString(), url = encodedImage, liked = false, shared = false, deleted = false)
         marsPhotoDao.insertMarsPhoto(marsPhoto)
     }
 
