@@ -30,6 +30,7 @@
 
 ## Vidéo de Démo
 
+https://github.com/MBDS-2023-2024/mini-projet-create-a-new-team/assets/104130152/9119ec44-7c39-48c2-8854-b6379d4fdc14
 
 
 ## Membres du Groupe
