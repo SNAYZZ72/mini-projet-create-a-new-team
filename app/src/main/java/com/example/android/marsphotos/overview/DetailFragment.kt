@@ -1,4 +1,8 @@
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +15,9 @@ import com.example.android.marsphotos.R
 import com.example.android.marsphotos.databinding.FragmentDetailBinding
 
 class DetailFragment : Fragment() {
+
     private lateinit var binding: FragmentDetailBinding
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -23,6 +29,7 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         // Récupérez l'URL de l'image passée en argument
         val imageUrl = arguments?.getString(ARG_IMAGE_URL)
