@@ -26,15 +26,21 @@
 
 ## Fonctionnalités Bonus
 
-1. **Système d'authentification :** Ajout d'un système d'authentification basé sur Firebase Auth pour garantir la sécurité des utilisateurs. Les utilisateurs peuvent désormais se connecter avec leurs comptes Google, Facebook, Twitter ou d'autres fournisseurs pris en charge par Firebase. Cette fonctionnalité est en cours de développement et non fonctionnel.
+1. **Système d'authentification :** Ajout d'un système d'authentification basé sur Firebase Auth pour garantir la sécurité des utilisateurs. Les utilisateurs peuvent désormais se connecter avec leurs comptes Google, Facebook, Twitter ou d'autres fournisseurs pris en charge par Firebase. Cette fonctionnalité est en cours de développement
+
+2. **Ajouter une nouvelle image :** Possibilité de prendre une photo ou d'en selectionner depuis la gallerie et l'enregistrer dans la base de données****
+
+   ![image](https://github.com/MBDS-2023-2024/mini-projet-create-a-new-team/assets/104130152/f7c96b9e-80f3-45e0-83ad-483417f0272f)
+
+
 
 ## Vidéo de Démo
 
-https://github.com/MBDS-2023-2024/mini-projet-create-a-new-team/assets/104130152/9119ec44-7c39-48c2-8854-b6379d4fdc14
+https://github.com/MBDS-2023-2024/mini-projet-create-a-new-team/assets/104130152/cebada19-d4e7-4f31-9edf-61489d85d260
 
 
 ## Membres du Groupe
 
 - **Nathan Sarmento :** Vue en Détail, Recherche/Filtrage.
 - **Matthieu Picot :** Suppression de Photos, Partage de Photos, Système d'authentification.
-- **Said Sabri :** Stockage en Mode Hors Ligne avec Room.
+- **Said Sabri :** Stockage en Mode Hors Ligne avec Room, Ajouter une nouvelle image.
