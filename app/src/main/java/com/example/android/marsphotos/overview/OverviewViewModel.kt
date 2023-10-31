@@ -5,6 +5,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.android.marsphotos.data.MarsDatabase
 import com.example.android.marsphotos.data.MarsPhoto
 import com.example.android.marsphotos.repository.MarsRepository
 import kotlinx.coroutines.Dispatchers
@@ -15,9 +16,12 @@ enum class MarsApiStatus { LOADING, ERROR, DONE }
 /**
  * The [ViewModel] that is attached to the [OverviewFragment].
  */
-class OverviewViewModel : ViewModel() {
+class OverviewViewModel(
+    private val repository: MarsRepository,
+    private val database: MarsDatabase
+) : ViewModel() {
 
-    private val repository = MarsRepository()
+    //private val repository = MarsRepository()
 
     private val _status = MediatorLiveData<MarsApiStatus>()
     val status: LiveData<MarsApiStatus> = _status
@@ -72,6 +76,5 @@ class OverviewViewModel : ViewModel() {
         repository.removePhoto(photoId)
         //on actualise la vue pour que la photo disparaisse
         photosLiveData.value = photosLiveData.value?.filter { it.id != photoId }
-
     }
 }

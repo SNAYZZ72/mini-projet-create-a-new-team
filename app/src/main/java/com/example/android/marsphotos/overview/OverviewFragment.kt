@@ -15,12 +15,26 @@ import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.marsphotos.R
+import com.example.android.marsphotos.data.MarsDatabase
 import com.example.android.marsphotos.data.MarsPhoto
 import kotlinx.coroutines.launch
+import com.example.android.marsphotos.repository.MarsRepository
+
 
 class OverviewFragment : Fragment() {
 
-    private val viewModel: OverviewViewModel by viewModels()
+
+    private val database by lazy {
+        MarsDatabase.getInstance(requireContext())
+    }
+
+    private val repository: MarsRepository by lazy {
+        MarsRepository(database.marsPhotoDao, requireContext())
+    }
+
+    private val viewModel: OverviewViewModel by viewModels{
+        OverviewViewModelFactory(repository, database)
+    }
 
     private val binding: FragmentOverviewBinding by lazy {
         FragmentOverviewBinding.inflate(layoutInflater)
@@ -117,7 +131,11 @@ class OverviewFragment : Fragment() {
         binding.deleteButton.setOnClickListener {
             selectedPhotos.forEach { photo ->
                 viewModel.deletePhoto(photo.id)
+                viewModel.viewModelScope.launch {
+                    repository.deletePhotoR(photo)
+                }
             }
+
             selectedPhotos.clear()
             adapter.notifyDataSetChanged()
             updateButtonState()
