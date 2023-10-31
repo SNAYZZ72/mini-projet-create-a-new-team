@@ -73,8 +73,13 @@ class OverviewViewModel(
     }
 
     fun deletePhoto(photoId: String) {
+        viewModelScope.launch {
+            repository.deletePhoto(photoId)
+        }
         repository.removePhoto(photoId)
         //on actualise la vue pour que la photo disparaisse
         photosLiveData.value = photosLiveData.value?.filter { it.id != photoId }
     }
+
+
 }

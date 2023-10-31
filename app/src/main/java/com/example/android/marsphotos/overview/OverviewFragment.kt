@@ -131,9 +131,6 @@ class OverviewFragment : Fragment() {
         binding.deleteButton.setOnClickListener {
             selectedPhotos.forEach { photo ->
                 viewModel.deletePhoto(photo.id)
-                viewModel.viewModelScope.launch {
-                    repository.deletePhotoR(photo)
-                }
             }
 
             selectedPhotos.clear()

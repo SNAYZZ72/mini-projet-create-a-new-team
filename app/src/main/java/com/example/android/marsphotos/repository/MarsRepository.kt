@@ -78,8 +78,11 @@ class MarsRepository(private val marsPhotoDao: MarsPhotoDao, private val context
         Log.d("MarsRepository", "removePhoto: $photoId")
     }
 
-    suspend fun deletePhotoR(photo: MarsPhoto) {
-        marsPhotoDao.deleteImages(listOf(photo.id))
+    suspend fun deletePhoto(photoId: String) {
+        val photoToDelete = marsPhotoDao.getAllImages().find { it.id == photoId }
+        photoToDelete?.let {
+            marsPhotoDao.deleteImage(it)
+        }
     }
 
 }
