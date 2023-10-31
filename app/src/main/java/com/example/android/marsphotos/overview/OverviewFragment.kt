@@ -200,16 +200,13 @@ class OverviewFragment : Fragment() {
             else {
                 selectedPhotos.forEach { photo ->
                     viewModel.deletePhoto(photo.id)
-                    viewModel.viewModelScope.launch {
-                        repository.deletePhotoR(photo)
-                    }
                 }
+
                 selectedPhotos.clear()
                 adapter.notifyDataSetChanged()
                 updateButtonState()
             }
         }
-
         val shareButton = binding.shareButton
 
         shareButton.setOnClickListener {
