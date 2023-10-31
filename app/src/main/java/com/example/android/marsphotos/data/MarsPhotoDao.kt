@@ -19,4 +19,7 @@ interface MarsPhotoDao {
 
     @Query("DELETE FROM mars_photos WHERE id In (:ids)")
     suspend fun deleteImages(ids: List<String>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMarsPhoto(marsPhoto: MarsPhoto)
 }

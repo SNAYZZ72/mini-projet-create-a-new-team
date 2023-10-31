@@ -1,8 +1,10 @@
 package com.example.android.marsphotos.repository
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.net.Uri
 import android.os.Build
 import com.example.android.marsphotos.api.MarsApi
 import com.example.android.marsphotos.data.MarsPhoto
@@ -11,6 +13,9 @@ import android.util.Log
 import com.example.android.marsphotos.data.MarsPhotoDao
 import com.example.android.marsphotos.extensions.toMarsPhoto
 import com.example.android.marsphotos.network.RetrofitProvider
+import java.io.ByteArrayOutputStream
+import java.util.UUID
+import android.util.Base64
 
 class MarsRepository(private val marsPhotoDao: MarsPhotoDao, private val context: Context) {
 
@@ -95,6 +100,11 @@ class MarsRepository(private val marsPhotoDao: MarsPhotoDao, private val context
         marsPhotos.find { it.id == photoId }?.liked = liked
         Log.d("MarsRepository", "updatePhoto: $photoId")
         Log.d("MarsRepository", "updatePhoto: $liked")
+    }
+
+    suspend fun savePhotoToDatabase(encodedImage: String) {
+        val marsPhoto = MarsPhoto(id = UUID.randomUUID().toString(), url = encodedImage)
+        marsPhotoDao.insertMarsPhoto(marsPhoto)
     }
 
 }

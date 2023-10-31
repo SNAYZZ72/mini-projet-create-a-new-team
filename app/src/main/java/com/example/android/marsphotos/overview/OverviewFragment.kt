@@ -1,8 +1,11 @@
 package com.example.android.marsphotos.overview
 
 import android.app.AlertDialog
+import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -23,11 +26,58 @@ import com.example.android.marsphotos.data.MarsDatabase
 import com.example.android.marsphotos.data.MarsPhoto
 import kotlinx.coroutines.launch
 import com.example.android.marsphotos.repository.MarsRepository
+import java.io.ByteArrayOutputStream
+import java.util.UUID
+import android.util.Base64
 
 import okhttp3.internal.filterList
 
 class OverviewFragment : Fragment() {
+    private val REQUEST_IMAGE_CAPTURE = 1
+    private val REQUEST_IMAGE_PICK = 2
 
+
+    fun openCamera() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (takePictureIntent.resolveActivity(requireActivity().packageManager) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
+        }
+    }
+
+    fun openGallery() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(intent, REQUEST_IMAGE_PICK)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                REQUEST_IMAGE_CAPTURE -> {
+                    val imageBitmap = data?.extras?.get("data") as Bitmap
+                    val encodedImage = convertBitmapToBase64(imageBitmap)
+                    saveImageToDatabase(encodedImage)
+                }
+                REQUEST_IMAGE_PICK -> {
+                    val selectedImageUri = data?.data
+                    val imageBitmap = MediaStore.Images.Media.getBitmap(requireContext().contentResolver, selectedImageUri)
+                    val encodedImage = convertBitmapToBase64(imageBitmap)
+                    saveImageToDatabase(encodedImage)
+                }
+            }
+        }
+    }
+
+    private fun convertBitmapToBase64(bitmap: Bitmap): String {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        val byteArray: ByteArray = byteArrayOutputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
+
+    private fun saveImageToDatabase(encodedImage: String) {
+        viewModel.savePhotoToDatabase(encodedImage)
+    }
 
     private val database by lazy {
         MarsDatabase.getInstance(requireContext())
@@ -122,6 +172,17 @@ class OverviewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val capturePhotoButton = view.findViewById<Button>(R.id.capturePhotoButton)
+        val selectPhotoButton = view.findViewById<Button>(R.id.selectPhotoButton)
+
+        capturePhotoButton.setOnClickListener {
+            openCamera()
+        }
+
+        selectPhotoButton.setOnClickListener {
+            openGallery()
+        }
 
         with(viewModel) {
             photos.observe(viewLifecycleOwner) {
@@ -278,4 +339,6 @@ class OverviewFragment : Fragment() {
             binding.shareButton.isEnabled = false
         }
     }
+
+
 }

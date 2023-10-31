@@ -10,6 +10,7 @@ import com.example.android.marsphotos.data.MarsPhoto
 import com.example.android.marsphotos.repository.MarsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 enum class MarsApiStatus { LOADING, ERROR, DONE }
 
@@ -81,6 +82,11 @@ class OverviewViewModel(
         photosLiveData.value = photosLiveData.value?.filter { it.id != photoId }
     }
 
+    fun savePhotoToDatabase(encodedImage: String) {
+        viewModelScope.launch {
+            repository.savePhotoToDatabase(encodedImage)
+        }
+    }
 
 
     fun getPhotoById(photoId: String?): MarsPhoto? {

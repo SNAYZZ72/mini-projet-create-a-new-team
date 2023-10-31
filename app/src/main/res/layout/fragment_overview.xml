@@ -89,4 +89,16 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
+    <Button
+        android:id="@+id/capturePhotoButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Capture Photo" />
+
+    <Button
+        android:id="@+id/selectPhotoButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Photo from Gallery" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -45,4 +45,6 @@
         android:padding="5dp"
         android:src="@drawable/ic_favorite_border_24"
         android:visibility="gone" />
+
+
 </RelativeLayout>
