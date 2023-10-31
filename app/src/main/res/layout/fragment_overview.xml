@@ -93,12 +93,20 @@
         android:id="@+id/capturePhotoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Capture Photo" />
+        android:text="Capture Photo"
+        android:layout_marginStart="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/selectPhotoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select Photo from Gallery" />
+        android:text="Select Photo"
+        android:layout_marginEnd="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
