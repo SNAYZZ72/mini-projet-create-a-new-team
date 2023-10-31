@@ -2,11 +2,30 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_filter_liked"
-        android:title="Photos aimées"
-        app:showAsAction="ifRoom"/>
-    <item
-        android:id="@+id/action_filter_all"
-        android:title="Toutes les photos"
-        app:showAsAction="ifRoom"/>
+        android:id="@+id/action_filter"
+        android:title="Filter"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/action_filter_liked"
+                android:title="Par favoris"
+                app:showAsAction="ifRoom"/>
+            <item
+                android:id="@+id/action_filter_tag"
+                android:title="Par tag"
+                app:showAsAction="ifRoom"/>
+            <item
+                android:id="@+id/action_filter_share"
+                android:title="Par partage"
+                app:showAsAction="ifRoom"/>
+            <item
+                android:id="@+id/action_filter_delete"
+                android:title="Par suppression"
+                app:showAsAction="ifRoom"/>
+            <item
+                android:id="@+id/action_filter_all"
+                android:title="Reinitialiser le filtre"
+                app:showAsAction="ifRoom"/>
+        </menu>
+    </item>
 </menu>
